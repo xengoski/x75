@@ -1,0 +1,188 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #007AFF;
+  --color-accent: #5856D6;
+
+  /* Calibrated, Non-Glare Status Tones (Dark Mode) */
+  --color-present: #238636;
+  --color-present-subtle: rgba(35, 134, 54, 0.16);
+  --color-present-text: #3FB950;
+
+  --color-absent: #A82828;
+  --color-absent-subtle: rgba(168, 40, 40, 0.16);
+  --color-absent-text: #E5534B;
+
+  --color-holiday: #92580E;
+  --color-holiday-subtle: rgba(217, 119, 6, 0.16);
+  --color-holiday-text: #F59E0B;
+
+  --color-duty: #1D4ED8;
+  --color-duty-subtle: rgba(29, 78, 216, 0.16);
+  --color-duty-text: #38BDF8;
+
+  /* Deep Tonal Dark Canvas */
+  --color-bg-base: #0B0C0E;
+  --color-surface-card: #13151A;
+  --color-surface-secondary: #1C1F27;
+  --color-surface-tertiary: #262A35;
+  --color-border: rgba(255, 255, 255, 0.075);
+  --color-border-subtle: rgba(255, 255, 255, 0.04);
+  --color-text-primary: #F5F6FA;
+  --color-text-secondary: #8E93A3;
+  --color-text-tertiary: #525768;
+}
+
+.light {
+  --color-present: #1F883D;
+  --color-present-subtle: rgba(31, 136, 61, 0.12);
+  --color-present-text: #1A7F37;
+
+  --color-absent: #CF222E;
+  --color-absent-subtle: rgba(207, 34, 46, 0.12);
+  --color-absent-text: #A40E26;
+
+  --color-holiday: #D97706;
+  --color-holiday-subtle: rgba(217, 119, 6, 0.12);
+  --color-holiday-text: #B45309;
+
+  --color-duty: #0969DA;
+  --color-duty-subtle: rgba(9, 105, 218, 0.12);
+  --color-duty-text: #0550AE;
+
+  --color-bg-base: #F4F5F8;
+  --color-surface-card: #FFFFFF;
+  --color-surface-secondary: #E9EBEF;
+  --color-surface-tertiary: #DCDEE5;
+  --color-border: rgba(0, 0, 0, 0.075);
+  --color-border-subtle: rgba(0, 0, 0, 0.035);
+  --color-text-primary: #101114;
+  --color-text-secondary: #606474;
+  --color-text-tertiary: #8E92A2;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+  letter-spacing: -0.012em;
+}
+
+/* Modern Tabular Numeral Hierarchy */
+.font-apple-num {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+/* Tactile Spring Micro-Interactions */
+.tap-spring {
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms ease, opacity 140ms ease, border-color 140ms ease;
+}
+.tap-spring:active {
+  transform: scale(0.965);
+}
+
+/* Smooth Light/Dark Theme Morph Transition */
+.theme-transitioning {
+  transition: background-color 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.theme-transitioning div,
+.theme-transitioning nav,
+.theme-transitioning main,
+.theme-transitioning p,
+.theme-transitioning span {
+  transition: background-color 380ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 380ms cubic-bezier(0.16, 1, 0.3, 1),
+              color 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* View Fade & Slide Entrance */
+@keyframes viewFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-view {
+  animation: viewFadeSlide 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Month Transition Slides */
+@keyframes monthSlideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes monthSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-left {
+  animation: monthSlideLeft 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-right {
+  animation: monthSlideRight 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Floating Action Capsule Pop (Reinvented Date Picker) */
+@keyframes capsulePop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-capsule {
+  animation: capsulePop 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Touch & Mobile Optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+input, textarea {
+  user-select: text;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 135, 0.18);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 120, 135, 0.35);
+}
