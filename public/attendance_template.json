@@ -1,0 +1,56 @@
+{
+  "_instructions": {
+    "valid_statuses": [
+      "PRESENT",
+      "ABSENT",
+      "DUTY_LEAVE",
+      "HOLIDAY"
+    ],
+    "date_format": "YYYY-MM-DD",
+    "status_notes": {
+      "PRESENT": "Attended class (note can be empty string)",
+      "ABSENT": "Missed class (e.g. Leave, Sick, Personal)",
+      "DUTY_LEAVE": "On-Duty / Sports / Symposium / Medical (counts as attended towards 75%)",
+      "HOLIDAY": "Sunday, National Holiday, Fest, or College Break (excluded from conducted classes)"
+    }
+  },
+  "student": {
+    "name": "YOUR NAME HERE",
+    "enrollNo": "260000",
+    "dept": "Department of Mechatronics",
+    "batch": "2026-2030",
+    "yearSem": "I / I / A"
+  },
+  "settings": {
+    "minThreshold": 75,
+    "accentColor": "#007AFF",
+    "isDarkMode": true,
+    "feedbackMode": "sound"
+  },
+  "records": {
+    "2026-09-03": {
+      "status": "PRESENT",
+      "note": ""
+    },
+    "2026-09-04": {
+      "status": "PRESENT",
+      "note": ""
+    },
+    "2026-09-06": {
+      "status": "HOLIDAY",
+      "note": "Sunday"
+    },
+    "2026-09-07": {
+      "status": "PRESENT",
+      "note": ""
+    },
+    "2026-09-08": {
+      "status": "ABSENT",
+      "note": "Leave"
+    },
+    "2026-09-09": {
+      "status": "DUTY_LEAVE",
+      "note": "On Duty"
+    }
+  }
+}
