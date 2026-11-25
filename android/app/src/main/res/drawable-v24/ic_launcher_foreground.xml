@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportHeight="108"
+    android:viewportWidth="108">
+    <!-- 360 Full Background Track -->
+    <path
+        android:strokeColor="#25FFFFFF"
+        android:strokeWidth="5"
+        android:pathData="M 54,26 A 28,28 0 1,1 53.9,26" />
+    <!-- 75% Active Arc Gauge (270 degrees clockwise from 12 o'clock to 9 o'clock) -->
+    <path
+        android:strokeColor="#007AFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M 54,26 A 28,28 0 1,1 26,54" />
+    <!-- 75% Threshold Target Pip -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 26,54 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
+    <!-- Center Minimalist Geometric X -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M 44,44 L 64,64 M 44,64 L 64,44" />
+</vector>
