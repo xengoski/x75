@@ -2,11 +2,15 @@
   "name": "x75",
   "private": true,
   "version": "1.0.0",
+  "description": "Minimalist college attendance tracker and 75% threshold defense engine",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:sync": "cap sync",
+    "cap:build": "vite build && cap sync android",
+    "build:apk": "vite build && cap sync android && cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.2",
@@ -14,7 +18,6 @@
     "@capacitor/cli": "^8.6.2",
     "@capacitor/core": "^8.6.2",
     "@capacitor/ios": "^8.6.2",
-    "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",
@@ -22,7 +25,6 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
-    "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

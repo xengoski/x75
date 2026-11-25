@@ -1,4 +1,4 @@
-// Mathematical Engine for 1-Day = 1-Attendance Project 75 Protocol
+// Attendance calculation engine and threshold margin formulas
 
 export const calculateDayAttendanceStats = (records = {}, minThreshold = 75) => {
   const target = Math.min(100, Math.max(1, parseFloat(minThreshold) || 75));

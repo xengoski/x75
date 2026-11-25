@@ -1,40 +1,104 @@
-# 📱 x75 // Minimalist College Attendance Protocol
+# x75
 
-A mobile-first, high-precision college attendance tracker built with modern tonal minimalism, fluid spring physics, and zero bloat.
+Minimalist college attendance tracker and margin defense utility for Android and Web.
 
----
+## Overview
 
-## ⚡ Core Architecture
+x75 is designed for academic environments enforcing strict attendance thresholds (typically 75%). Rather than tracking complicated hourly timetable slots, it operates on a verified daily record model: each calendar day is either a working instructional day (`PRESENT`, `ABSENT`, `DUTY_LEAVE`) or a non-instructional day (`HOLIDAY`).
 
-### 1. 🎯 1 Day = 1 Attendance Tracking
-- **Present**: Attended college.
-- **Absent**: Leave / bunked instruction day.
-- **Holiday**: Official holiday / college break (zero penalty to attendance percentage).
-- **On-Duty (OD)**: College-verified duty / medical leave (counted as attended).
+## Mathematics & Margin Engine
 
-### 2. 🛡️ The 75% Defense Margin
-- **Safe Leave Days**: Calculates the exact number of days you can miss without dropping below your target:
-  $$\text{Safe Leaves} = \left\lfloor \frac{\text{Attended Days} \times 100 - \text{Target} \times \text{Conducted Days}}{\text{Target}} \right\rfloor$$
-- **Consecutive Recovery Days**: If below target, calculates the exact consecutive days you must attend to recover:
-  $$\text{Days Needed} = \left\lceil \frac{\text{Target} \times \text{Conducted Days} - \text{Attended Days} \times 100}{100 - \text{Target}} \right\rceil$$
+The core calculation treats attendance as a discrete margin above or below a target percentage $T$ (default $75\%$):
 
-### 3. 📅 Interactive Calendar & Floating Action Capsule
-- Fluid month navigation with left/right spring slide animations.
-- Unboxed monthly status count tally (Present, Absent, Holiday, On Duty).
-- Tap any date to open the **Floating Action Capsule** for instant 4-way logging, inline holiday labeling, or clearing records.
+Given:
+- $A$: Attended working days (`PRESENT` + `DUTY_LEAVE`)
+- $C$: Total conducted instructional days (`PRESENT` + `ABSENT` + `DUTY_LEAVE`)
+- $T$: Target attendance percentage ($50 \le T \le 95$)
 
-### 4. 🎛️ Settings & Haptics
-- 3-pilled feedback switch: **Sound** (Web Audio haptic clicks), **Vibrate** (device vibration), or **Off** (silent).
-- Target Threshold slider (50%–95%, 75% standard default).
-- System Accent Swatches + custom hex picker.
-- Light Mode and Deep Tonal Dark Mode with smooth morph transitions.
-- Full offline JSON backup export and import.
+Current percentage:
+$$P = \frac{A}{C} \times 100$$
 
----
+### 1. Bunk Allowance (Surplus Margin)
+When $P \ge T$, the maximum number of consecutive instructional days $L$ you can safely miss without dropping below $T$:
 
-## 🚀 Running the App
+$$L = \left\lfloor \frac{100A - TC}{T} \right\rfloor$$
+
+### 2. Recovery Requirement (Deficit Margin)
+When $P < T$, the minimum number of consecutive instructional days $R$ you must attend without absence to recover compliance:
+
+$$R = \left\lceil \frac{TC - 100A}{100 - T} \right\rceil$$
+
+## Features
+
+- **Daily Attendance Tracking**: One-tap logging for Present, Absent, On-Duty, and Holiday.
+- **Calendar Matrix**: Month-by-month calendar view with unboxed status tallies and date-specific note annotation.
+- **Batch Logging Tool**: Fast-fill date ranges with customizable status and automatic Sunday holiday exclusion.
+- **Offline First**: All data stored locally via LocalStorage; zero telemetry, zero analytics, zero external network requests.
+- **JSON Import / Export**: Standardized JSON structure for backups and sharing semester timetables with classmates.
+- **Tactile Feedback**: Configurable audio click feedback (via Web Audio synthetic impulse) and device vibration.
+- **Cross-Platform Mobile**: Native Android build powered by Capacitor 8 with hardware back gesture handling and custom adaptive launcher icons.
+
+## Data Format
+
+Attendance records use ISO 8601 date keys (`YYYY-MM-DD`):
+
+```json
+{
+  "student": {
+    "name": "Jane Doe",
+    "enrollNo": "260001",
+    "dept": "Mechatronics",
+    "batch": "2026-2030",
+    "yearSem": "I / I / A"
+  },
+  "records": {
+    "2026-09-03": { "status": "PRESENT", "note": "" },
+    "2026-09-04": { "status": "PRESENT", "note": "" },
+    "2026-09-06": { "status": "HOLIDAY", "note": "Sunday" },
+    "2026-09-09": { "status": "ABSENT", "note": "Sick Leave" },
+    "2026-10-14": { "status": "DUTY_LEAVE", "note": "Symposium" }
+  }
+}
+```
+
+## Tech Stack
+
+- **Framework**: React 18
+- **Bundler**: Vite 6
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Mobile Bridge**: Capacitor 8 (Android & iOS)
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+
+- JDK 21 (for Android builds)
+- Android SDK (build-tools 35.0.0+)
+
+### Setup
 
 ```bash
-npm run dev     # Start dev server on http://localhost:5173
-npm run build   # Production build
+git clone git@github.com:xengoski/x75.git
+cd x75
+npm install
 ```
+
+### Web Development
+
+```bash
+npm run dev        # Starts Vite dev server at http://localhost:5173
+npm run build      # Generates static assets in dist/
+npm run preview    # Local preview of production build
+```
+
+### Android Build
+
+```bash
+npm run cap:build  # Compiles web bundle and syncs to Android project
+npm run build:apk  # Compiles debug APK via Gradle
+```
+
+Output APK will be generated at:
+`android/app/build/outputs/apk/debug/app-debug.apk`
