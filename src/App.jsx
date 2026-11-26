@@ -142,33 +142,81 @@ export default function App() {
   };
 
   // Clean Overwrite Import: Auto-removes any mock records
+  const handleImportJsonData = (rawJson) => {
+    try {
+      const parsed = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
+      if (parsed && parsed.records) {
+        setAppState({
+          records: parsed.records,
+          settings: {
+            ...INITIAL_STATE.settings,
+            ...(parsed.settings || {})
+          }
+        });
+        sfx.confirm();
+        const studentInfo = parsed.student?.name ? ` for ${parsed.student.name}` : '';
+        const count = Object.keys(parsed.records).length;
+        alert(`Successfully imported ${count} attendance records${studentInfo}!`);
+      } else {
+        alert('Invalid attendance format: missing "records" dictionary.');
+      }
+    } catch (e) {
+      console.error('Failed to parse attendance JSON', e);
+      alert('Could not parse imported attendance JSON file.');
+    }
+  };
+
   const handleImportFile = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      try {
-        const parsed = JSON.parse(event.target.result);
-        if (parsed.records) {
-          setAppState({
-            records: parsed.records,
-            settings: {
-              ...INITIAL_STATE.settings,
-              ...(parsed.settings || {})
-            }
-          });
-          sfx.confirm();
-          alert(`Successfully imported ${Object.keys(parsed.records).length} records! Previous mock data removed.`);
-        } else {
-          alert('Invalid backup format: missing "records" dictionary.');
-        }
-      } catch {
-        alert('Failed to parse JSON file.');
-      }
+      handleImportJsonData(event.target.result);
     };
     reader.readAsText(file);
     e.target.value = '';
   };
+
+  // JSON Runner: Auto-load files opened via Android system Intent (ACTION_VIEW)
+  useEffect(() => {
+    const checkNativePendingJson = () => {
+      try {
+        if (window.JsonRunnerBridge && typeof window.JsonRunnerBridge.getPendingJson === 'function') {
+          const raw = window.JsonRunnerBridge.getPendingJson();
+          if (raw) {
+            handleImportJsonData(raw);
+          }
+        }
+      } catch (err) {
+        console.error('Error checking JsonRunnerBridge', err);
+      }
+    };
+
+    window.onOpenJsonFile = (jsonString) => {
+      handleImportJsonData(jsonString);
+    };
+
+    let appUrlHandle = null;
+    const setupCapUrl = async () => {
+      try {
+        appUrlHandle = await CapApp.addListener('appUrlOpen', () => {
+          checkNativePendingJson();
+        });
+      } catch {
+        // Desktop browser fallback
+      }
+    };
+    setupCapUrl();
+
+    checkNativePendingJson();
+    const timer = setTimeout(checkNativePendingJson, 350);
+
+    return () => {
+      clearTimeout(timer);
+      if (appUrlHandle && appUrlHandle.remove) appUrlHandle.remove();
+      window.onOpenJsonFile = null;
+    };
+  }, []);
 
   // Wipe All Records for a Clean Semester Slate
   const handleWipeAllRecords = () => {

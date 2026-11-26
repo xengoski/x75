@@ -41,3 +41,9 @@ ios/App/DerivedData/
 # Temporary files
 *.tmp
 *.bak
+
+# Student attendance records (keep repository clean and generic)
+*_attendance.json
+public/*_attendance.json
+!attendance_template.json
+!public/attendance_template.json

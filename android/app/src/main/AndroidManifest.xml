@@ -22,6 +22,80 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- JSON Runner: Match by MIME types (application/json, text/plain, octet-stream, wildcard) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/json" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="text/plain" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\.JSON" />
+                <data android:pathSuffix=".json" />
+                <data android:pathSuffix=".JSON" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\.JSON" />
+                <data android:pathSuffix=".json" />
+                <data android:pathSuffix=".JSON" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\.JSON" />
+                <data android:pathSuffix=".json" />
+                <data android:pathSuffix=".JSON" />
+            </intent-filter>
+
+            <!-- JSON Runner: Match content and file URIs directly ending with .json -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\.JSON" />
+                <data android:pathSuffix=".json" />
+                <data android:pathSuffix=".JSON" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.json" />
+                <data android:pathPattern=".*\\.JSON" />
+                <data android:pathSuffix=".json" />
+                <data android:pathSuffix=".JSON" />
+            </intent-filter>
+
         </activity>
 
         <provider
