@@ -233,11 +233,14 @@ npm run build:apk
 
 ## Releases & Installation
 
-Ready-to-install Android `.apk` builds are published under [**Releases**](https://github.com/xengoski/x75/releases).
+Official standalone Android `.apk` builds are published under [**Releases**](https://github.com/xengoski/x75/releases).
 
-1. Download [`x75-v1.0.0.apk`](https://github.com/xengoski/x75/releases/download/v1.0.0/x75-v1.0.0.apk) on your Android device.
-2. Allow installation from unknown sources.
-3. Launch `x75` and authenticate with your student profile or admin passkey.
+| Application | Package ID | Target Audience | Direct Download |
+| :--- | :--- | :--- | :--- |
+| **`x75 Student`** | `com.x75.app` | Cohort Students (Margin HUD, 1-Time Setup) | [**x75-v1.0.apk**](https://github.com/xengoski/x75/releases/download/v1.0.0/x75-v1.0.apk) |
+| **`x75 Admin`** | `com.x75.admin` | Class Reps & Admins (Batch Marking, Cloud Sync) | [**x75-admin-v1.0.apk**](https://github.com/xengoski/x75/releases/download/v1.0.0/x75-admin-v1.0.apk) |
+
+> **Side-by-Side Installation**: Both APKs feature distinct package IDs and can be installed simultaneously on the same Android device.
 
 ---
 

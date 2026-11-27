@@ -79,6 +79,8 @@ export const saveActiveEnrollNo = (enrollNo) => {
 
 export const loadActiveRole = () => {
   try {
+    const envRole = typeof import.meta !== 'undefined' && import.meta.env?.VITE_APP_ROLE;
+    if (envRole === 'admin' || envRole === 'student') return envRole;
     return localStorage.getItem(KEY_ACTIVE_ROLE) || 'student';
   } catch {
     return 'student';

@@ -24,7 +24,7 @@ import { applyThemeToDocument } from './utils/theme';
 import { calculateDayAttendanceStats } from './utils/attendanceLogic';
 import { sfx } from './utils/audio';
 import { 
-  Shield, User, RotateCcw, Check, X
+  Shield, User, RotateCcw, Check, X, ChevronLeft
 } from 'lucide-react';
 import { 
   flushPendingMutations, pullCohortFromTurso, pushCohortToTurso, 
@@ -460,6 +460,19 @@ export default function App() {
               <span className="font-display font-extrabold text-lg tracking-tight text-[var(--color-text-primary)] lowercase flex items-baseline">
                 x<span style={{ color: (accentColor === '#FFFFFF' || accentColor === '#000000') ? (isDark ? '#FFFFFF' : '#121316') : (accentColor || 'var(--color-primary)') }}>75</span>
               </span>
+              {import.meta.env.VITE_APP_ROLE === 'admin' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    sfx.tap();
+                    setRole('admin');
+                  }}
+                  className="px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-semibold flex items-center space-x-1 tap-spring"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Back to Admin</span>
+                </button>
+              )}
             </div>
 
             {/* View Switcher: Status / Calendar / Settings */}
