@@ -1,7 +1,7 @@
 import React from 'react';
-import { Moon, Sun, Download, Upload, Check, Volume2, VolumeX, Smartphone, FileCode2, Trash2 } from 'lucide-react';
-import { APPLE_ACCENTS } from '../utils/theme';
+import { Moon, Sun, Volume2, VolumeX, Smartphone, ArrowLeftRight } from 'lucide-react';
 import { sfx } from '../utils/audio';
+import { ColorSpectrumPicker } from './common/ColorSpectrumPicker';
 
 export const ConfigView = ({
   settings,
@@ -10,10 +10,8 @@ export const ConfigView = ({
   onSelectAccent,
   isDark,
   setIsDark,
-  onExport,
-  onImportClick,
-  onWipeAllRecords,
-  onDownloadTemplate
+  studentName = '',
+  onSwitchStudent
 }) => {
   const minThreshold = settings.minThreshold || 75;
   const feedbackMode = settings.feedbackMode || 'sound'; // 'sound' | 'vibrate' | 'off'
@@ -28,7 +26,7 @@ export const ConfigView = ({
     onUpdateSettings({ ...settings, feedbackMode: mode });
     sfx.setMode(mode);
     if (mode === 'sound') sfx.tap();
-    else if (mode === 'vibrate') sfx.haptic([15, 30, 15]);
+    else if (mode === 'vibrate') sfx.haptic('medium');
   };
 
   return (
@@ -39,7 +37,35 @@ export const ConfigView = ({
           Settings
         </h2>
 
-        {/* Section 1: Target Threshold */}
+        {/* Student Profile Card (Hyperminimal: Name + Mechatronics A + Switch User Button) */}
+        {studentName && (
+          <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-between shadow-xs text-left">
+            <div className="min-w-0 pr-2 space-y-0.5">
+              <span className="text-sm font-bold text-[var(--color-text-primary)] block truncate">
+                {studentName}
+              </span>
+              <span className="text-xs text-[var(--color-text-secondary)] block font-medium">
+                Mechatronics A
+              </span>
+            </div>
+
+            {onSwitchStudent && (
+              <button
+                type="button"
+                onClick={() => {
+                  sfx.tap();
+                  onSwitchStudent();
+                }}
+                className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-[var(--color-surface-secondary)] hover:bg-[var(--color-surface-tertiary)] text-[var(--color-text-primary)] border border-[var(--color-border)] tap-spring flex items-center space-x-1.5 shrink-0"
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5 text-[var(--color-text-secondary)]" />
+                <span>Switch User</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Target Threshold */}
         <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
@@ -67,19 +93,16 @@ export const ConfigView = ({
           </div>
         </div>
 
-        {/* Section 2: Feedback (Smooth Sliding 3-Pilled Control with Zero Clipping) */}
+        {/* Feedback & Haptics (Zero Subtext Clutter) */}
         <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-3 shadow-xs">
-          <div>
+          <div className="text-left">
             <span className="text-xs font-semibold text-[var(--color-text-primary)] block">
               Feedback & Haptics
-            </span>
-            <span className="text-[11px] text-[var(--color-text-secondary)]">
-              {feedbackMode === 'sound' ? 'Audio clicks & haptics' : feedbackMode === 'vibrate' ? 'Haptics only' : 'Completely silent'}
             </span>
           </div>
 
           <div className="relative flex p-1 rounded-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] w-full select-none h-9 items-center overflow-hidden">
-            {/* Sliding Active Pill Background with Bouncy Physical Spring */}
+            {/* Sliding Active Pill Background */}
             <div 
               className="absolute top-1 bottom-1 rounded-full bg-[var(--color-surface-card)] shadow-xs transition-transform duration-300 ease-[cubic-bezier(0.34,1.3,0.64,1)] pointer-events-none"
               style={{
@@ -124,73 +147,25 @@ export const ConfigView = ({
           </div>
         </div>
 
-        {/* Section 3: Accent Color (Including Nothing Monochrome) */}
-        <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-3 shadow-xs">
-          <span className="text-xs font-semibold text-[var(--color-text-secondary)] block">
-            Accent Color
-          </span>
-
-          <div className="flex items-center justify-between gap-1 sm:gap-1.5 flex-nowrap">
-            {APPLE_ACCENTS.map((item) => {
-              const isSelected = item.isMonochrome
-                ? (accentColor?.toLowerCase() === '#ffffff' || accentColor === 'monochrome')
-                : (accentColor || '#007AFF').toLowerCase() === item.color.toLowerCase();
-
-              const swatchBg = item.isMonochrome 
-                ? (isDark ? '#FFFFFF' : '#121316') 
-                : item.color;
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    sfx.tap();
-                    onSelectAccent(item.color);
-                  }}
-                  className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center tap-spring border border-[var(--color-border)] ${
-                    isSelected ? 'scale-110 ring-2 ring-offset-2 ring-offset-[var(--color-surface-card)] ring-[var(--color-text-primary)]' : 'hover:scale-105 opacity-85 hover:opacity-100'
-                  }`}
-                  style={{ backgroundColor: swatchBg }}
-                  title={item.name}
-                >
-                  {isSelected && (
-                    <Check 
-                      className={`w-4 h-4 stroke-[2.5] ${item.isMonochrome ? (isDark ? 'text-black' : 'text-white') : 'text-white'}`} 
-                    />
-                  )}
-                </button>
-              );
-            })}
-
-            {/* Custom Color Input */}
-            <label 
-              className="w-8 h-8 shrink-0 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-secondary)] flex items-center justify-center cursor-pointer tap-spring"
-              title="Custom Hex"
-            >
-              <input
-                type="color"
-                value={accentColor || '#007AFF'}
-                onChange={(e) => onSelectAccent(e.target.value)}
-                className="opacity-0 absolute w-0 h-0"
-              />
-              <span className="text-[10px] font-bold text-[var(--color-text-secondary)]">+</span>
-            </label>
-          </div>
+        {/* Accent Color (Curated Swatches + Visual Rainbow Spectrum Slider - Zero Hex) */}
+        <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] shadow-xs text-left">
+          <ColorSpectrumPicker
+            accentColor={accentColor}
+            onSelectAccent={onSelectAccent}
+            isDark={isDark}
+          />
         </div>
 
-        {/* Section 4: Appearance (Smooth Sliding Pill Animation with Zero Clipping) */}
+        {/* Appearance (Zero Subtext Clutter) */}
         <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-between shadow-xs">
-          <div>
+          <div className="text-left">
             <span className="text-xs font-semibold text-[var(--color-text-primary)] block">
               Appearance
-            </span>
-            <span className="text-[11px] text-[var(--color-text-secondary)]">
-              {isDark ? 'Dark Mode' : 'Light Mode'}
             </span>
           </div>
 
           <div className="relative flex p-1 rounded-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] w-[164px] select-none h-9 items-center overflow-hidden">
-            {/* Sliding Active Pill Background with Bouncy Physical Spring */}
+            {/* Sliding Active Pill Background */}
             <div 
               className="absolute top-1 bottom-1 rounded-full bg-[var(--color-surface-card)] shadow-xs transition-transform duration-300 ease-[cubic-bezier(0.34,1.3,0.64,1)] pointer-events-none"
               style={{
@@ -227,76 +202,6 @@ export const ConfigView = ({
               <Moon className={`w-3.5 h-3.5 transition-transform duration-300 ${isDark ? 'rotate-0 scale-110 text-[var(--color-primary)]' : 'rotate-45 scale-90'}`} />
               <span>Dark</span>
             </button>
-          </div>
-        </div>
-
-        {/* Section 5: Data Management & Student Templates */}
-        <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] space-y-3 shadow-xs text-left">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[var(--color-text-secondary)] block">
-              Data & Backup
-            </span>
-            <span className="text-[10px] text-[var(--color-text-tertiary)]">
-              JSON format
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                sfx.tap();
-                onExport();
-              }}
-              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-[var(--color-surface-secondary)] hover:bg-[var(--color-surface-tertiary)] text-[var(--color-text-primary)] flex items-center justify-center space-x-1.5 tap-spring"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export JSON</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                sfx.tap();
-                onImportClick();
-              }}
-              className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-[var(--color-surface-secondary)] hover:bg-[var(--color-surface-tertiary)] text-[var(--color-text-primary)] flex items-center justify-center space-x-1.5 tap-spring"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              <span>Import JSON</span>
-            </button>
-          </div>
-
-          {/* Template & Reset Actions */}
-          <div className="pt-2 border-t border-[var(--color-border-subtle)]">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  sfx.tap();
-                  onDownloadTemplate();
-                }}
-                className="py-2.5 px-2.5 rounded-xl text-xs font-semibold bg-[var(--color-surface-secondary)] hover:bg-[var(--color-surface-tertiary)] text-[var(--color-text-primary)] flex items-center justify-center space-x-1.5 tap-spring"
-                title="Download JSON template to share with classmates"
-              >
-                <FileCode2 className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                <span>Share Template</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  sfx.tap();
-                  if (confirm('Are you sure you want to wipe all records for a new semester?')) {
-                    onWipeAllRecords();
-                  }
-                }}
-                className="py-2.5 px-2.5 rounded-xl text-xs font-semibold bg-[var(--color-absent)]/10 text-[var(--color-absent-text)] hover:bg-[var(--color-absent)]/20 flex items-center justify-center space-x-1.5 tap-spring"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Wipe All Data</span>
-              </button>
-            </div>
           </div>
         </div>
 

@@ -9,7 +9,10 @@ export const StatusView = ({
   todayRecord,
   onMarkToday,
   onClearToday,
-  accentColor
+  accentColor,
+  isReadOnly = false,
+  studentName = '',
+  enrollNo = ''
 }) => {
   const {
     percentage,
@@ -127,120 +130,153 @@ export const StatusView = ({
 
       {/* Daily Input Section Anchored at the Bottom */}
       <div className="pt-4 border-t border-[var(--color-border)] space-y-3">
-        {/* Date + Indicator */}
-        <div className="flex items-center justify-between min-h-[22px]">
-          <span className="text-xs font-semibold text-[var(--color-text-primary)] tracking-tight">
-            {formattedDate}
-          </span>
-          
-          {currentStatus === 'UNRECORDED' ? (
-            isSunday ? (
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-holiday-subtle)] text-[var(--color-holiday-text)]">
-                Sunday (Off)
-              </span>
-            ) : (
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full text-[var(--color-text-tertiary)] bg-[var(--color-surface-secondary)] border border-[var(--color-border-subtle)]">
-                Unrecorded
-              </span>
-            )
-          ) : currentStatus === 'HOLIDAY' ? (
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-holiday-subtle)] text-[var(--color-holiday-text)]">
-              {todayRecord?.note || 'Holiday'}
+        {isReadOnly ? (
+          /* Hyperminimal Unified Today Status Box */
+          <div className="p-3.5 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border)] flex items-center justify-between text-left shadow-xs">
+            <span className="text-xs font-semibold text-[var(--color-text-primary)] tracking-tight">
+              {formattedDate}
             </span>
-          ) : currentStatus === 'DUTY_LEAVE' ? (
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-duty-subtle)] text-[var(--color-duty-text)]">
-              On Duty
-            </span>
-          ) : null}
-        </div>
 
-        {/* Primary Action Buttons: Clean Borderless Tonal Fills */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => {
-              sfx.present();
-              onMarkToday('PRESENT');
-            }}
-            className={`py-3 px-4 rounded-xl text-sm tap-spring flex items-center justify-center space-x-1.5 transition-all ${
-              currentStatus === 'PRESENT'
-                ? 'bg-[var(--color-present)]/20 text-[var(--color-present-text)] font-bold border border-transparent shadow-xs'
-                : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-semibold'
-            }`}
-          >
-            <Check className="w-4 h-4 stroke-[2.5]" />
-            <span>Present</span>
-          </button>
+            <div className="flex items-center space-x-2">
+              <span className={`w-2 h-2 rounded-full ${
+                currentStatus === 'PRESENT' ? 'bg-[var(--color-present)]' :
+                currentStatus === 'ABSENT' ? 'bg-[var(--color-absent)]' :
+                currentStatus === 'DUTY_LEAVE' ? 'bg-[var(--color-duty)]' :
+                currentStatus === 'HOLIDAY' ? 'bg-[var(--color-holiday)]' :
+                'bg-[var(--color-text-tertiary)]'
+              }`} />
+              <span className={`text-xs font-bold ${
+                currentStatus === 'PRESENT' ? 'text-[var(--color-present-text)]' :
+                currentStatus === 'ABSENT' ? 'text-[var(--color-absent-text)]' :
+                currentStatus === 'DUTY_LEAVE' ? 'text-[var(--color-duty-text)]' :
+                currentStatus === 'HOLIDAY' ? 'text-[var(--color-holiday-text)]' :
+                'text-[var(--color-text-tertiary)]'
+              }`}>
+                {currentStatus === 'PRESENT' && 'Present'}
+                {currentStatus === 'ABSENT' && 'Absent'}
+                {currentStatus === 'DUTY_LEAVE' && 'On Duty'}
+                {currentStatus === 'HOLIDAY' && (todayRecord?.note || (isSunday ? 'Sunday' : 'Holiday'))}
+                {currentStatus === 'UNRECORDED' && (isSunday ? 'Sunday' : 'Not Marked')}
+              </span>
+            </div>
+          </div>
+        ) : (
+          /* Editable Mode: Action Buttons */
+          <>
+            {/* Date + Indicator */}
+            <div className="flex items-center justify-between min-h-[22px]">
+              <span className="text-xs font-semibold text-[var(--color-text-primary)] tracking-tight">
+                {formattedDate}
+              </span>
+              
+              {currentStatus === 'UNRECORDED' ? (
+                isSunday ? (
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-holiday-subtle)] text-[var(--color-holiday-text)]">
+                    Sunday (Off)
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full text-[var(--color-text-tertiary)] bg-[var(--color-surface-secondary)] border border-[var(--color-border-subtle)]">
+                    Unrecorded
+                  </span>
+                )
+              ) : currentStatus === 'HOLIDAY' ? (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-holiday-subtle)] text-[var(--color-holiday-text)]">
+                  {todayRecord?.note || 'Holiday'}
+                </span>
+              ) : currentStatus === 'DUTY_LEAVE' ? (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-duty-subtle)] text-[var(--color-duty-text)]">
+                  On Duty
+                </span>
+              ) : null}
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  sfx.present();
+                  onMarkToday('PRESENT');
+                }}
+                className={`py-3 px-4 rounded-xl text-sm tap-spring flex items-center justify-center space-x-1.5 transition-all ${
+                  currentStatus === 'PRESENT'
+                    ? 'bg-[var(--color-present)]/20 text-[var(--color-present-text)] font-bold border border-transparent shadow-xs'
+                    : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-semibold'
+                }`}
+              >
+                <Check className="w-4 h-4 stroke-[2.5]" />
+                <span>Present</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              sfx.absent();
-              onMarkToday('ABSENT');
-            }}
-            className={`py-3 px-4 rounded-xl text-sm tap-spring flex items-center justify-center space-x-1.5 transition-all ${
-              currentStatus === 'ABSENT'
-                ? 'bg-[var(--color-absent)]/20 text-[var(--color-absent-text)] font-bold border border-transparent shadow-xs'
-                : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-semibold'
-            }`}
-          >
-            <X className="w-4 h-4 stroke-[2.5]" />
-            <span>Absent</span>
-          </button>
-        </div>
+              <button
+                type="button"
+                onClick={() => {
+                  sfx.absent();
+                  onMarkToday('ABSENT');
+                }}
+                className={`py-3 px-4 rounded-xl text-sm tap-spring flex items-center justify-center space-x-1.5 transition-all ${
+                  currentStatus === 'ABSENT'
+                    ? 'bg-[var(--color-absent)]/20 text-[var(--color-absent-text)] font-bold border border-transparent shadow-xs'
+                    : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-semibold'
+                }`}
+              >
+                <X className="w-4 h-4 stroke-[2.5]" />
+                <span>Absent</span>
+              </button>
+            </div>
 
-        {/* Secondary Actions: On Duty & Holiday */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => {
-              sfx.tap();
-              onMarkToday('DUTY_LEAVE');
-            }}
-            className={`py-2 px-3 rounded-xl text-xs tap-spring flex items-center justify-center space-x-1.5 transition-all ${
-              currentStatus === 'DUTY_LEAVE'
-                ? 'bg-[var(--color-duty)]/20 text-[var(--color-duty-text)] font-bold border border-transparent shadow-xs'
-                : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-medium'
-            }`}
-          >
-            <Briefcase className="w-3.5 h-3.5" />
-            <span>On Duty</span>
-          </button>
+            {/* Secondary Actions: On Duty & Holiday */}
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  sfx.tap();
+                  onMarkToday('DUTY_LEAVE');
+                }}
+                className={`py-2 px-3 rounded-xl text-xs tap-spring flex items-center justify-center space-x-1.5 transition-all ${
+                  currentStatus === 'DUTY_LEAVE'
+                    ? 'bg-[var(--color-duty)]/20 text-[var(--color-duty-text)] font-bold border border-transparent shadow-xs'
+                    : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-medium'
+                }`}
+              >
+                <Briefcase className="w-3.5 h-3.5" />
+                <span>On Duty</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              sfx.tap();
-              onMarkToday('HOLIDAY');
-            }}
-            className={`py-2 px-3 rounded-xl text-xs tap-spring flex items-center justify-center space-x-1.5 transition-all ${
-              currentStatus === 'HOLIDAY'
-                ? 'bg-[var(--color-holiday)]/20 text-[var(--color-holiday-text)] font-bold border border-transparent shadow-xs'
-                : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-medium'
-            }`}
-          >
-            <Star className="w-3.5 h-3.5" />
-            <span>Holiday</span>
-          </button>
-        </div>
+              <button
+                type="button"
+                onClick={() => {
+                  sfx.tap();
+                  onMarkToday('HOLIDAY');
+                }}
+                className={`py-2 px-3 rounded-xl text-xs tap-spring flex items-center justify-center space-x-1.5 transition-all ${
+                  currentStatus === 'HOLIDAY'
+                    ? 'bg-[var(--color-holiday)]/20 text-[var(--color-holiday-text)] font-bold border border-transparent shadow-xs'
+                    : 'bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-[var(--color-border)] font-medium'
+                }`}
+              >
+                <Star className="w-3.5 h-3.5" />
+                <span>Holiday</span>
+              </button>
+            </div>
 
-        {/* Clear Option Slot - persistent height prevents any layout shift */}
-        <div className={`text-center h-6 flex items-center justify-center transition-opacity duration-200 ${
-          currentStatus !== 'UNRECORDED' ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}>
-          <button
-            type="button"
-            onClick={() => {
-              sfx.tap();
-              onClearToday();
-            }}
-            tabIndex={currentStatus !== 'UNRECORDED' ? 0 : -1}
-            className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] tap-spring inline-flex items-center space-x-1 py-0.5 px-2"
-          >
-            <RotateCcw className="w-3 h-3" />
-            <span>Reset today</span>
-          </button>
-        </div>
+            {/* Clear Option Slot - persistent height prevents any layout shift */}
+            <div className={`text-center h-6 flex items-center justify-center transition-opacity duration-200 ${
+              currentStatus !== 'UNRECORDED' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}>
+              <button
+                type="button"
+                onClick={() => {
+                  sfx.tap();
+                  onClearToday();
+                }}
+                tabIndex={currentStatus !== 'UNRECORDED' ? 0 : -1}
+                className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] tap-spring inline-flex items-center space-x-1 py-0.5 px-2"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset today</span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
     </div>

@@ -1,4 +1,5 @@
-// Tactile Feedback Engine: Sound (Web Audio) + Haptics (Navigator.vibrate)
+// Tactile Feedback Engine: Sound (Web Audio) + Native Haptics (@capacitor/haptics + Navigator.vibrate)
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 class FeedbackManager {
   constructor() {
@@ -17,18 +18,37 @@ class FeedbackManager {
     }
   }
 
-  haptic(pattern = 10) {
+  async haptic(intensity = 'light') {
     if (this.mode === 'off') return;
     try {
-      if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(pattern);
+      if (intensity === 'light' || intensity === 10) {
+        await Haptics.impact({ style: ImpactStyle.Light });
+      } else if (intensity === 'medium') {
+        await Haptics.impact({ style: ImpactStyle.Medium });
+      } else if (intensity === 'heavy') {
+        await Haptics.impact({ style: ImpactStyle.Heavy });
+      } else if (intensity === 'success') {
+        await Haptics.notification({ type: NotificationType.Success });
+      } else if (intensity === 'warning') {
+        await Haptics.notification({ type: NotificationType.Warning });
+      } else if (Array.isArray(intensity)) {
+        await Haptics.vibrate({ duration: intensity[0] || 25 });
+      } else {
+        await Haptics.impact({ style: ImpactStyle.Light });
       }
-    } catch {}
+    } catch {
+      // Fallback to Web API navigator.vibrate
+      try {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          navigator.vibrate(Array.isArray(intensity) ? intensity : typeof intensity === 'number' ? intensity : 15);
+        }
+      } catch {}
+    }
   }
 
   tap() {
     if (this.mode === 'off') return;
-    this.haptic(10);
+    this.haptic('light');
     if (this.mode !== 'sound') return;
 
     try {
@@ -57,7 +77,7 @@ class FeedbackManager {
 
   confirm() {
     if (this.mode === 'off') return;
-    this.haptic([12, 40, 16]);
+    this.haptic('medium');
     if (this.mode !== 'sound') return;
 
     try {

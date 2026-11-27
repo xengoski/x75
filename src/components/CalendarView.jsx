@@ -13,7 +13,8 @@ export const CalendarView = ({
   records,
   onUpdateRecord,
   onBatchUpdateRecords,
-  accentColor
+  accentColor,
+  isReadOnly = false
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [slideDirection, setSlideDirection] = useState(null); // 'left' | 'right' | null
@@ -233,14 +234,16 @@ export const CalendarView = ({
             </span>
 
             {/* Semi-Hidden 3-Bar Menu Button for Batch Fill */}
-            <button
-              type="button"
-              onClick={openBatchModal}
-              className="p-1 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] tap-spring transition-colors"
-              title="Batch Fill Attendance"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={openBatchModal}
+                className="p-1 rounded-md text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)] tap-spring transition-colors"
+                title="Batch Fill Attendance"
+              >
+                <Menu className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center space-x-1">
@@ -320,10 +323,6 @@ export const CalendarView = ({
         </div>
       </div>
 
-      <div className="text-xs text-[var(--color-text-tertiary)] text-center pt-1 font-normal tracking-tight">
-        Tap any date to log or revise
-      </div>
-
       {/* Floating Action Capsule (Individual Date Modal) */}
       {isModalOpen && selectedDateStr && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -336,7 +335,7 @@ export const CalendarView = ({
                   {selectedDateFormatted}
                 </span>
                 <span className="text-[11px] text-[var(--color-text-secondary)]">
-                  {selectedRecord?.note || (isSelectedSunday ? 'Sunday Holiday' : 'Select Status')}
+                  {selectedRecord?.note || (isSelectedSunday ? 'Sunday Holiday' : isReadOnly ? 'Attendance Status' : 'Select Status')}
                 </span>
               </div>
               <button
@@ -348,130 +347,172 @@ export const CalendarView = ({
               </button>
             </div>
 
-            {/* 4-Way Segmented Tactile Grid */}
-            <div className="grid grid-cols-2 gap-2">
-              {/* Present */}
-              <button
-                type="button"
-                onClick={() => handleSetStatus('PRESENT', '')}
-                className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
-                  selectedRecord?.status === 'PRESENT'
-                    ? 'bg-[var(--color-present)]/20 text-[var(--color-present-text)] font-bold border border-transparent shadow-xs'
-                    : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
-                }`}
-              >
-                <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'PRESENT' ? 'bg-[var(--color-present)]/30 text-[var(--color-present-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
-                  <Check className="w-4 h-4 stroke-[2.5]" />
+            {isReadOnly ? (
+              /* Read-Only Date View */
+              <div className="space-y-3 pt-1">
+                <div className="p-3.5 rounded-2xl bg-[var(--color-surface-secondary)] flex items-center space-x-3 text-left">
+                  <div className={`w-3.5 h-3.5 rounded-full shrink-0 ${
+                    selectedRecord?.status === 'PRESENT' ? 'bg-[var(--color-present)] ring-4 ring-[var(--color-present)]/20' :
+                    selectedRecord?.status === 'ABSENT' ? 'bg-[var(--color-absent)] ring-4 ring-[var(--color-absent)]/20' :
+                    selectedRecord?.status === 'DUTY_LEAVE' ? 'bg-[var(--color-duty)] ring-4 ring-[var(--color-duty)]/20' :
+                    selectedRecord?.status === 'HOLIDAY' ? 'bg-[var(--color-holiday)] ring-4 ring-[var(--color-holiday)]/20' :
+                    'bg-[var(--color-text-tertiary)]/40'
+                  }`} />
+                  <div>
+                    <span className="text-xs font-bold text-[var(--color-text-primary)] block">
+                      {selectedRecord?.status === 'PRESENT' && 'Present'}
+                      {selectedRecord?.status === 'ABSENT' && 'Absent'}
+                      {selectedRecord?.status === 'DUTY_LEAVE' && 'On Duty (Exempt)'}
+                      {selectedRecord?.status === 'HOLIDAY' && `Holiday: ${selectedRecord?.note || (isSelectedSunday ? 'Sunday' : 'Holiday')}`}
+                      {(!selectedRecord?.status || selectedRecord?.status === 'UNRECORDED') && (isSelectedSunday ? 'Sunday Holiday' : 'No Class / Unrecorded')}
+                    </span>
+                    <span className="text-[11px] text-[var(--color-text-secondary)]">
+                      {selectedRecord?.status === 'PRESENT' ? 'Full day academic attendance verified' :
+                       selectedRecord?.status === 'ABSENT' ? 'Marked absent by instructor' :
+                       selectedRecord?.status === 'DUTY_LEAVE' ? 'Official extracurricular / medical leave' :
+                       selectedRecord?.status === 'HOLIDAY' ? 'No attendance conducted' : 'No record logged'}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-xs font-semibold">Present</span>
-              </button>
 
-              {/* Absent */}
-              <button
-                type="button"
-                onClick={() => handleSetStatus('ABSENT', 'Leave')}
-                className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
-                  selectedRecord?.status === 'ABSENT'
-                    ? 'bg-[var(--color-absent)]/20 text-[var(--color-absent-text)] font-bold border border-transparent shadow-xs'
-                    : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
-                }`}
-              >
-                <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'ABSENT' ? 'bg-[var(--color-absent)]/30 text-[var(--color-absent-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
-                  <X className="w-4 h-4 stroke-[2.5]" />
-                </div>
-                <span className="text-xs font-semibold">Absent</span>
-              </button>
-
-              {/* Holiday */}
-              <button
-                type="button"
-                onClick={() => handleSetStatus('HOLIDAY', holidayNote || (isSelectedSunday ? 'Sunday' : 'Holiday'))}
-                className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
-                  selectedRecord?.status === 'HOLIDAY'
-                    ? 'bg-[var(--color-holiday)]/20 text-[var(--color-holiday-text)] font-bold border border-transparent shadow-xs'
-                    : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
-                }`}
-              >
-                <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'HOLIDAY' ? 'bg-[var(--color-holiday)]/30 text-[var(--color-holiday-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
-                  <Star className="w-4 h-4 stroke-[2.5]" />
-                </div>
-                <span className="text-xs font-semibold">Holiday</span>
-              </button>
-
-              {/* On Duty */}
-              <button
-                type="button"
-                onClick={() => handleSetStatus('DUTY_LEAVE', 'On Duty')}
-                className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
-                  selectedRecord?.status === 'DUTY_LEAVE'
-                    ? 'bg-[var(--color-duty)]/20 text-[var(--color-duty-text)] font-bold border border-transparent shadow-xs'
-                    : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
-                }`}
-              >
-                <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'DUTY_LEAVE' ? 'bg-[var(--color-duty)]/30 text-[var(--color-duty-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
-                  <Briefcase className="w-4 h-4 stroke-[2.5]" />
-                </div>
-                <span className="text-xs font-semibold">On Duty</span>
-              </button>
-            </div>
-
-            {/* Inline Holiday Label Field if Holiday is Active */}
-            {selectedRecord?.status === 'HOLIDAY' && (
-              <div className="p-2.5 rounded-2xl bg-[var(--color-surface-secondary)] space-y-2 animate-view">
-                <span className="text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider block">
-                  Holiday Label
-                </span>
-                <input
-                  type="text"
-                  value={holidayNote}
-                  placeholder="e.g. Festival, Sunday, Fest"
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setHolidayNote(val);
-                    onUpdateRecord(selectedDateStr, { status: 'HOLIDAY', note: val });
-                  }}
-                  className="w-full text-xs py-1.5 px-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-primary)]"
-                />
-                <div className="flex gap-1.5 flex-wrap">
-                  {['Sunday', 'College Fest', 'Break', 'National Holiday', 'Study Leave'].map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => {
-                        sfx.tap();
-                        setHolidayNote(tag);
-                        onUpdateRecord(selectedDateStr, { status: 'HOLIDAY', note: tag });
-                      }}
-                      className="text-[10px] px-2 py-0.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] tap-spring"
-                    >
-                      {tag}
-                    </button>
-                  ))}
+                <div className="pt-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="py-1.5 px-5 rounded-xl text-xs font-semibold bg-[var(--color-text-primary)] text-[var(--color-bg-base)] tap-spring"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
+            ) : (
+              <>
+                {/* 4-Way Segmented Tactile Grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Present */}
+                  <button
+                    type="button"
+                    onClick={() => handleSetStatus('PRESENT', '')}
+                    className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
+                      selectedRecord?.status === 'PRESENT'
+                        ? 'bg-[var(--color-present)]/20 text-[var(--color-present-text)] font-bold border border-transparent shadow-xs'
+                        : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'PRESENT' ? 'bg-[var(--color-present)]/30 text-[var(--color-present-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
+                      <Check className="w-4 h-4 stroke-[2.5]" />
+                    </div>
+                    <span className="text-xs font-semibold">Present</span>
+                  </button>
+
+                  {/* Absent */}
+                  <button
+                    type="button"
+                    onClick={() => handleSetStatus('ABSENT', 'Leave')}
+                    className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
+                      selectedRecord?.status === 'ABSENT'
+                        ? 'bg-[var(--color-absent)]/20 text-[var(--color-absent-text)] font-bold border border-transparent shadow-xs'
+                        : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'ABSENT' ? 'bg-[var(--color-absent)]/30 text-[var(--color-absent-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
+                      <X className="w-4 h-4 stroke-[2.5]" />
+                    </div>
+                    <span className="text-xs font-semibold">Absent</span>
+                  </button>
+
+                  {/* Holiday */}
+                  <button
+                    type="button"
+                    onClick={() => handleSetStatus('HOLIDAY', holidayNote || (isSelectedSunday ? 'Sunday' : 'Holiday'))}
+                    className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
+                      selectedRecord?.status === 'HOLIDAY'
+                        ? 'bg-[var(--color-holiday)]/20 text-[var(--color-holiday-text)] font-bold border border-transparent shadow-xs'
+                        : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'HOLIDAY' ? 'bg-[var(--color-holiday)]/30 text-[var(--color-holiday-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
+                      <Star className="w-4 h-4 stroke-[2.5]" />
+                    </div>
+                    <span className="text-xs font-semibold">Holiday</span>
+                  </button>
+
+                  {/* On Duty */}
+                  <button
+                    type="button"
+                    onClick={() => handleSetStatus('DUTY_LEAVE', 'On Duty')}
+                    className={`p-3 rounded-2xl flex items-center space-x-2 tap-spring transition-all ${
+                      selectedRecord?.status === 'DUTY_LEAVE'
+                        ? 'bg-[var(--color-duty)]/20 text-[var(--color-duty-text)] font-bold border border-transparent shadow-xs'
+                        : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] border border-transparent hover:bg-[var(--color-surface-tertiary)]'
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-xl ${selectedRecord?.status === 'DUTY_LEAVE' ? 'bg-[var(--color-duty)]/30 text-[var(--color-duty-text)]' : 'bg-[var(--color-surface-card)] text-[var(--color-text-secondary)]'}`}>
+                      <Briefcase className="w-4 h-4 stroke-[2.5]" />
+                    </div>
+                    <span className="text-xs font-semibold">On Duty</span>
+                  </button>
+                </div>
+
+                {/* Inline Holiday Label Field if Holiday is Active */}
+                {selectedRecord?.status === 'HOLIDAY' && (
+                  <div className="p-2.5 rounded-2xl bg-[var(--color-surface-secondary)] space-y-2 animate-view">
+                    <span className="text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider block">
+                      Holiday Label
+                    </span>
+                    <input
+                      type="text"
+                      value={holidayNote}
+                      placeholder="e.g. Festival, Sunday, Fest"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setHolidayNote(val);
+                        onUpdateRecord(selectedDateStr, { status: 'HOLIDAY', note: val });
+                      }}
+                      className="w-full text-xs py-1.5 px-2.5 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-primary)]"
+                    />
+                    <div className="flex gap-1.5 flex-wrap">
+                      {['Sunday', 'College Fest', 'Break', 'National Holiday', 'Study Leave'].map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => {
+                            sfx.tap();
+                            setHolidayNote(tag);
+                            onUpdateRecord(selectedDateStr, { status: 'HOLIDAY', note: tag });
+                          }}
+                          className="text-[10px] px-2 py-0.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] tap-spring"
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Footer: Done & Clear */}
+                <div className="pt-1 flex items-center justify-between">
+                  {selectedRecord?.status !== 'UNRECORDED' ? (
+                    <button
+                      type="button"
+                      onClick={handleClearRecord}
+                      className="text-xs text-[var(--color-absent-text)] hover:opacity-80 tap-spring flex items-center space-x-1 py-1 px-1 font-medium"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear</span>
+                    </button>
+                  ) : <div />}
+
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="py-1.5 px-4 rounded-xl text-xs font-semibold bg-[var(--color-text-primary)] text-[var(--color-bg-base)] tap-spring"
+                  >
+                    Done
+                  </button>
+                </div>
+              </>
             )}
-
-            {/* Footer: Done & Clear */}
-            <div className="pt-1 flex items-center justify-between">
-              {selectedRecord?.status !== 'UNRECORDED' ? (
-                <button
-                  type="button"
-                  onClick={handleClearRecord}
-                  className="text-xs text-[var(--color-absent-text)] hover:opacity-80 tap-spring flex items-center space-x-1 py-1 px-1 font-medium"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Clear</span>
-                </button>
-              ) : <div />}
-
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="py-1.5 px-4 rounded-xl text-xs font-semibold bg-[var(--color-text-primary)] text-[var(--color-bg-base)] tap-spring"
-              >
-                Done
-              </button>
-            </div>
 
           </div>
         </div>
