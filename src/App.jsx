@@ -290,7 +290,7 @@ export default function App() {
   }, [cohortStudents, studentSearchQuery]);
 
   return (
-    <div className="w-full h-full sm:w-screen sm:h-screen bg-[var(--color-bg-base)] sm:bg-[#070709] flex flex-col items-center justify-between p-0 sm:p-3 select-none overflow-hidden text-[var(--color-text-primary)]">
+    <div className="w-full h-[100dvh] sm:w-screen sm:h-screen bg-[var(--color-bg-base)] sm:bg-[#070709] flex flex-col items-center justify-between p-0 sm:p-3 select-none overflow-hidden text-[var(--color-text-primary)]">
       
       {/* Hidden file input for import */}
       <input
@@ -405,7 +405,7 @@ export default function App() {
 
       {/* Main Application Container (Edge-to-edge on mobile, framed on desktop sm:max-w-[400px]) */}
       <div 
-        className="w-full max-w-full sm:max-w-[400px] h-full sm:h-[844px] sm:max-h-[88vh] flex flex-col justify-between overflow-hidden relative shadow-2xl transition-all duration-300 sm:rounded-[28px] sm:border sm:border-[var(--color-border)] bg-[var(--color-bg-base)] text-[var(--color-text-primary)]"
+        className="w-full max-w-full sm:max-w-[400px] h-[100dvh] sm:h-[844px] sm:max-h-[88vh] flex flex-col justify-between overflow-hidden relative shadow-2xl transition-all duration-300 sm:rounded-[28px] sm:border sm:border-[var(--color-border)] bg-[var(--color-bg-base)] text-[var(--color-text-primary)]"
       >
         {role === 'admin' ? (
           /* Android Admin App with Password Auth (pass6789) */

@@ -12,7 +12,7 @@ export const BottomNav = ({ activeTab, setActiveTab, accentColor }) => {
   const activeIndex = Math.max(0, TABS.findIndex(t => t.id === activeTab));
 
   return (
-    <div className="w-full px-5 pb-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:pb-5 pt-1 select-none flex justify-center pointer-events-none">
+    <div className="w-full px-5 pb-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:pb-5 pt-1 select-none flex justify-center pointer-events-none shrink-0 z-30">
       {/* Modern iOS 18 / M3 Expressive Floating Dock Capsule */}
       <nav className="w-full max-w-[320px] rounded-full border border-[var(--color-border)] bg-[var(--color-surface-card)]/95 backdrop-blur-lg shadow-xl shadow-black/30 grid grid-cols-3 p-1 pointer-events-auto transition-all relative overflow-hidden">
         
